@@ -1,0 +1,24 @@
+services:
+  backend:
+    build: .
+    container_name: DevTask_Backend
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    networks:
+      - amix-network
+  
+  frontend:
+    build: ./frontend
+    container_name: DevTask_Frontend
+    ports:
+      - "5173:5173"
+    expose:
+      - 5173
+    networks:
+      - amix-network
+
+networks:
+  amix-network:
+    driver: bridge

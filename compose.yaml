@@ -20,9 +20,9 @@ services:
       - "5432:5432"
 
     environment:
-      - POSTGRES_DB=devtask_db
-      - POSTGRES_USER=ador
-      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=devtasks
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
   adminer:
     container_name: postgres_adminer

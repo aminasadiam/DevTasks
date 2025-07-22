@@ -1,22 +1,43 @@
 package config
 
 import (
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
 )
 
-var (
-	Port string
-)
+type DbConfig struct {
+	DBHost     string
+	DBPort     string
+	DBUser     string
+	DBPassword string
+	DBName     string
+}
 
-func Load() error {
+type ServerConfig struct {
+	Port string
+}
+
+func init() {
 	err := godotenv.Load()
 	if err != nil {
-		return err
+		log.Fatalf("Unable to load env file: %v", err)
 	}
+}
 
-	Port = os.Getenv("PORT")
+func LoadDbConfig() *DbConfig {
+	return &DbConfig{
+		DBHost:     os.Getenv("DBHOST"),
+		DBPort:     os.Getenv("DBPORT"),
+		DBUser:     os.Getenv("DBUSER"),
+		DBPassword: os.Getenv("DBPASS"),
+		DBName:     os.Getenv("DBNAME"),
+	}
+}
 
-	return nil
+func LoadServerConfig() *ServerConfig {
+	return &ServerConfig{
+		Port: os.Getenv("SERVERPORT"),
+	}
 }

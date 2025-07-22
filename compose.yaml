@@ -1,9 +1,15 @@
 services:
   backend:
     build: .
-    container_name: DevTask_Backend
+    container_name: DevTasks_Backend
     ports:
       - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    container_name: DevTasks_Frontend
+    ports:
+      - "3030:3030"
 
   database:
     container_name: postgres_database

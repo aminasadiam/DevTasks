@@ -4,21 +4,23 @@ services:
     container_name: DevTask_Backend
     ports:
       - "3000:3000"
-    expose:
-      - 3000
-    networks:
-      - amix-network
-  
-  frontend:
-    build: ./frontend
-    container_name: DevTask_Frontend
-    ports:
-      - "5173:5173"
-    expose:
-      - 5173
-    networks:
-      - amix-network
 
-networks:
-  amix-network:
-    driver: bridge
+  database:
+    container_name: postgres_database
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    ports:
+      - "5432:5432"
+
+    environment:
+      - POSTGRES_DB=devtask_db
+      - POSTGRES_USER=ador
+      - POSTGRES_PASSWORD=12345678
+
+  adminer:
+    container_name: postgres_adminer
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"

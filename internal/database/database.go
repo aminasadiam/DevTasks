@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/aminasadiam/DevTasks/config"
 	"github.com/aminasadiam/DevTasks/internal/models"
@@ -18,7 +19,11 @@ func InitDB(cfg *config.DbConfig) *gorm.DB {
 		panic("failed to connect to database")
 	}
 
+	log.Println("Connected to Database.")
+
 	db.AutoMigrate(&models.User{}, &models.Project{}, &models.Task{})
+
+	log.Println("Successful Migration.")
 
 	return db
 }

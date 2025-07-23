@@ -1,5 +1,5 @@
-BINDIR=./bin
-MAIN=./cmd/server/main.go
+BINDIR=bin
+MAIN=cmd/server/main.go
 APPNAME=devtasks
 
 GOBUILD=go build
@@ -21,4 +21,4 @@ test:
 
 clean:
 	@$(GOCLEAN)
-	@rm -r $(BINDIR)
+	@if exist $(BINDIR) rmdir /s /q $(BINDIR)

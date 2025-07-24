@@ -29,6 +29,10 @@ func Serve(config *config.ServerConfig) error {
 	// User Routes
 	mux.HandleFunc("GET /api/users", GetUsers)
 
+	mux.HandleFunc("POST /api/register", RegisterHandler)
+	mux.HandleFunc("POST /api/login", LoginHandler)
+	mux.HandleFunc("/api/logout", LogoutHandler)
+
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),
 		Handler: mux,

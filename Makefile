@@ -8,7 +8,7 @@ GOCLEAN=go clean
 
 .PHONY: all
 
-all: build run
+all: test build run clean
 
 build:
 	@$(GOBUILD) -o $(BINDIR)/$(APPNAME) $(MAIN)

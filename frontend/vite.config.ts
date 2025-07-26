@@ -1,11 +1,12 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import solidPlugin from 'vite-plugin-solid';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [solidPlugin()],
   server: {
-    host: true,
-    port: 3030
-  }
-})
+    port: 3030,
+  },
+  build: {
+    target: 'esnext',
+  },
+});

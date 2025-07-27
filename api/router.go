@@ -41,6 +41,9 @@ func Serve(config *config.ServerConfig) error {
 	// Projects Routes
 	mux.HandleFunc("GET /api/projects", GetProjects)
 	mux.HandleFunc("POST /api/add-project", AddProject)
+	mux.HandleFunc("GET /api/project", GetProjectById)
+	mux.HandleFunc("PUT /api/update-project", UpdateProject)
+	mux.HandleFunc("DELETE /api/delete-project", DeleteProject)
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

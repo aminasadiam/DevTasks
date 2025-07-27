@@ -62,3 +62,10 @@ func (r *UserRepository) ExistEmail(email string) bool {
 func (r *UserRepository) Update(user *models.User) {
 	r.db.Model(&models.User{}).Where("id = ?", user.ID).Save(user)
 }
+
+func (r *UserRepository) GetUserIdByUsername(username string) (userId uint) {
+	var user models.User
+	r.db.Model(models.User{}).Where("username = ?", username).Find(&user)
+	userId = user.ID
+	return
+}

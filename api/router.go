@@ -12,6 +12,7 @@ import (
 
 	"github.com/aminasadiam/DevTasks/config"
 	"github.com/aminasadiam/DevTasks/internal/database"
+	"github.com/aminasadiam/DevTasks/internal/repository"
 	"gorm.io/gorm"
 )
 
@@ -20,6 +21,10 @@ var DB *gorm.DB
 func init() {
 	cfg := config.LoadDbConfig()
 	DB = database.InitDB(cfg)
+
+	userRepository = *repository.NewUserRepository(DB)
+	projectRepository = *repository.NewProjectRepository(DB)
+	taskRepository = *repository.NewTaskRepository(DB)
 }
 
 func Serve(config *config.ServerConfig) error {
@@ -32,6 +37,10 @@ func Serve(config *config.ServerConfig) error {
 	mux.HandleFunc("POST /api/register", RegisterHandler)
 	mux.HandleFunc("POST /api/login", LoginHandler)
 	mux.HandleFunc("/api/logout", LogoutHandler)
+
+	// Projects Routes
+	mux.HandleFunc("GET /api/projects", GetProjects)
+	mux.HandleFunc("POST /api/add-project", AddProject)
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),

@@ -15,10 +15,6 @@ import (
 var userRepository repository.UserRepository
 var AuthError = errors.New("Unauthorized")
 
-func init() {
-	userRepository = *repository.NewUserRepository(DB)
-}
-
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -117,7 +113,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	userRepository.Update(user)
 
 	w.WriteHeader(http.StatusAccepted)
-	json.NewEncoder(w).Encode("Login Successfuly")
+	json.NewEncoder(w).Encode(csrfToken)
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {

@@ -2,8 +2,8 @@
 import { render } from 'solid-js/web';
 
 import './index.css';
-import App from './App';
-import { Route, Router } from '@solidjs/router';
+import App from './App.jsx';
+import { Navigate, Route, Router } from '@solidjs/router';
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 
@@ -19,5 +19,6 @@ render(() => (
   <Router root={App}>
     <Route path={'/'} component={Home} />
     <Route path={'/login'} component={Login} />
+    <Route path="*" component={() => <Navigate href="/login" />} />
   </Router>
 ), root!);

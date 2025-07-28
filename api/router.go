@@ -13,6 +13,7 @@ import (
 	"github.com/aminasadiam/DevTasks/config"
 	"github.com/aminasadiam/DevTasks/internal/database"
 	"github.com/aminasadiam/DevTasks/internal/repository"
+	"github.com/rs/cors"
 	"gorm.io/gorm"
 )
 
@@ -33,10 +34,10 @@ func Serve(config *config.ServerConfig) error {
 	// Routes
 	// User Routes
 	mux.HandleFunc("GET /api/users", GetUsers)
-
 	mux.HandleFunc("POST /api/register", RegisterHandler)
 	mux.HandleFunc("POST /api/login", LoginHandler)
 	mux.HandleFunc("/api/logout", LogoutHandler)
+	mux.HandleFunc("POST /api/validate", ValidateSession)
 
 	// Projects Routes
 	mux.HandleFunc("GET /api/projects", GetProjects)
@@ -52,9 +53,18 @@ func Serve(config *config.ServerConfig) error {
 	mux.HandleFunc("PUT /api/update-task", UpdateTask)
 	mux.HandleFunc("DELETE /api/delete-task", DeleteTask)
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3030"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "X-CSRF-Token", "application/x-www-form-urlencoded"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(mux)
+
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", config.Port),
-		Handler: mux,
+		Handler: handler,
 	}
 
 	// Channel to listen for interrupt signals

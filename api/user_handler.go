@@ -98,7 +98,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Name:     "session_token",
 		Value:    sessionToken,
 		Expires:  time.Now().Add((24 * time.Hour) * 7),
-		HttpOnly: true,
+		HttpOnly: false,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+		Secure:   false, // Set to true in production with HTTPS
 	})
 
 	http.SetCookie(w, &http.Cookie{
@@ -106,14 +109,18 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Value:    csrfToken,
 		Expires:  time.Now().Add((24 * time.Hour) * 7),
 		HttpOnly: false,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+		Secure:   false, // Set to true in production with HTTPS
 	})
 
 	user.SessionToken = sessionToken
 	user.CSRFToken = csrfToken
 	userRepository.Update(user)
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
-	json.NewEncoder(w).Encode(csrfToken)
+	json.NewEncoder(w).Encode(map[string]string{"csrfToken": csrfToken})
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -127,6 +134,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	http.SetCookie(w, &http.Cookie{
@@ -134,6 +142,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		Value:    "",
 		Expires:  time.Now().Add(-time.Hour),
 		HttpOnly: false,
+		SameSite: http.SameSiteStrictMode,
 	})
 
 	username := strings.TrimSpace(r.FormValue("username"))
@@ -164,4 +173,19 @@ func Authorize(r *http.Request) error {
 	}
 
 	return nil
+}
+
+func ValidateSession(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if err := Authorize(r); err != nil {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "valid"})
 }

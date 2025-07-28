@@ -22,7 +22,7 @@ const ProtectedRoute: Component<ParentProps> = (props: ParentProps) => {
   onCleanup(() => clearInterval(interval));
 
   return (
-    <Show when={isAuthenticated() || location.pathname === '/login'} fallback={<Navigate href="/login" />}>
+    <Show when={isAuthenticated() || location.pathname === '/login' || location.pathname === '/register'} fallback={<Navigate href="/login" />}>
       {props.children}
     </Show>
   );

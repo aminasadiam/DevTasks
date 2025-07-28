@@ -10,7 +10,8 @@ const Login: Component = () => {
     const [loggedIn, setLoggedIn] = createSignal(false); // Initialize with false
 
     onMount(async () => {
-        const isAuthenticated = await checkAuth();
+        const usrname = localStorage.getItem('username') || '';
+        const isAuthenticated = await checkAuth(usrname);
         setLoggedIn(isAuthenticated);
     });
 

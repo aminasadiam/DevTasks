@@ -8,6 +8,7 @@ import { getProjects, Project } from "../Services/ProjectService.js";
 const Home: Component = () => {
   const [projects, setProjects] = createSignal<Project[]>([]);
   const [error, setError] = createSignal("");
+  const [showConfirm, setShowConfirm] = createSignal(false);
   const navigate = useNavigate();
   const username = localStorage.getItem("username") || "";
   onMount(() => {
@@ -27,7 +28,16 @@ const Home: Component = () => {
   });
 
   const handleLogout = () => {
+    setShowConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    setShowConfirm(false);
     logout(username, navigate);
+  };
+
+  const cancelLogout = () => {
+    setShowConfirm(false);
   };
 
   return (
@@ -64,6 +74,31 @@ const Home: Component = () => {
         >
           New Project
         </button>
+        {/* Confirmation Modal */}
+        {showConfirm() && (
+          <div class="fixed inset-0 flex items-center justify-center rounded-xl bg-gray-800 bg-opacity-50 z-50">
+            <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+              <h3 class="text-xl font-bold mb-4 text-gray-800">
+                Are you sure?
+              </h3>
+              <p class="mb-6 text-gray-600">Do you really want to logout?</p>
+              <div class="flex justify-center gap-4">
+                <button
+                  class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                  onClick={confirmLogout}
+                >
+                  Yes, Logout
+                </button>
+                <button
+                  class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 transition"
+                  onClick={cancelLogout}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </GlassCard>
     </div>
   );

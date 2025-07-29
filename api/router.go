@@ -40,7 +40,7 @@ func Serve(config *config.ServerConfig) error {
 	mux.HandleFunc("POST /api/validate", ValidateSession)
 
 	// Projects Routes
-	mux.HandleFunc("GET /api/projects", GetProjects)
+	mux.HandleFunc("POST /api/projects", GetProjects)
 	mux.HandleFunc("POST /api/add-project", AddProject)
 	mux.HandleFunc("GET /api/project", GetProjectById)
 	mux.HandleFunc("PUT /api/update-project", UpdateProject)

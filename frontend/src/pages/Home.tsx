@@ -58,7 +58,10 @@ const Home: Component = () => {
         <div class="col-auto">
           {projects().length > 0 ? (
             projects().map((project: Project) => (
-              <div class="bg-gray-700 flex text-gray-300 my-3 p-4 rounded-md cursor-pointer hover:scale-105 duration-300">
+              <div
+                class="bg-gray-700 flex text-gray-300 my-3 p-4 rounded-md cursor-pointer hover:scale-105 duration-300"
+                onClick={() => navigate(`/project/${project.ID}`)}
+              >
                 <h2 class="font-bold">{project.Name}</h2>
                 <span class="m-auto">{project.Description}</span>
               </div>

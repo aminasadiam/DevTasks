@@ -8,6 +8,7 @@ import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import AddProject from "./pages/AddProject.jsx";
+import ProjectDetails from "./pages/Project.jsx";
 
 const root = document.getElementById("root");
 
@@ -25,6 +26,7 @@ render(
       <Route path={"/register"} component={Register} />
 
       <Route path={"/project/new"} component={AddProject} />
+      <Route path={"/project/:id"} component={ProjectDetails} />
 
       <Route path="*" component={() => <Navigate href="/login" />} />
     </Router>

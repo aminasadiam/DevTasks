@@ -47,7 +47,7 @@ func Serve(config *config.ServerConfig) error {
 	mux.HandleFunc("DELETE /api/delete-project", DeleteProject)
 
 	// Tasks Routes
-	mux.HandleFunc("GET /api/tasks", GetTasks)
+	mux.HandleFunc("POST /api/tasks", GetTasks)
 	mux.HandleFunc("POST /api/add-task", AddTask)
 	mux.HandleFunc("GET /api/task", GetTaskById)
 	mux.HandleFunc("PUT /api/update-task", UpdateTask)

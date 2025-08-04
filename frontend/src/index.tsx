@@ -9,6 +9,8 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import AddProject from "./pages/AddProject.jsx";
 import ProjectDetails from "./pages/Project.jsx";
+import AddTask from "./pages/AddTask.jsx";
+import Task from "./pages/Task.jsx";
 
 const root = document.getElementById("root");
 
@@ -27,6 +29,9 @@ render(
 
       <Route path={"/project/new"} component={AddProject} />
       <Route path={"/project/:id"} component={ProjectDetails} />
+
+      <Route path={"/project/:project_id/task/new"} component={AddTask} />
+      <Route path={"/project/:project_id/task/:id"} component={Task} />
 
       <Route path="*" component={() => <Navigate href="/login" />} />
     </Router>

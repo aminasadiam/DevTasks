@@ -1,16 +1,24 @@
 import { Component, onCleanup, onMount } from "solid-js";
-import * as THREE from 'three';
+import * as THREE from "three";
 
 const Background: Component = () => {
-    let canvasRef: HTMLCanvasElement | undefined;
+  let canvasRef: HTMLCanvasElement | undefined;
 
   onMount(() => {
     if (!canvasRef) return;
 
     // Scene setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef, alpha: true });
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvasRef,
+      alpha: true,
+    });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -26,7 +34,10 @@ const Background: Component = () => {
     }
 
     const particlesGeometry = new THREE.BufferGeometry();
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    particlesGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(posArray, 3)
+    );
     const particleMaterial = new THREE.PointsMaterial({
       size: 0.5,
       sizeAttenuation: true,
@@ -54,7 +65,7 @@ const Background: Component = () => {
       mouseX = (event.clientX / window.innerWidth) * 2 - 1; // Normalize to [-1, 1]
       mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
     };
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener("mousemove", onMouseMove);
 
     // Animation loop
     const animate = () => {
@@ -63,13 +74,18 @@ const Background: Component = () => {
       particles.rotation.x += 0.0001;
 
       // Update particle positions based on mouse
-      const positions = particlesGeometry.attributes.position.array as Float32Array;
+      const positions = particlesGeometry.attributes.position
+        .array as Float32Array;
       for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        const dist = Math.sqrt((positions[i3] - camera.position.x) ** 2 + (positions[i3 + 1] - camera.position.y) ** 2);
+        const dist = Math.sqrt(
+          (positions[i3] - camera.position.x) ** 2 +
+            (positions[i3 + 1] - camera.position.y) ** 2
+        );
         const effectStrength = Math.max(0, 100 - dist) / 100; // Fade effect with distance
         positions[i3] = basePositions[i3] + mouseX * effectStrength * 10; // X displacement
-        positions[i3 + 1] = basePositions[i3 + 1] + mouseY * effectStrength * 10; // Y displacement
+        positions[i3 + 1] =
+          basePositions[i3 + 1] + mouseY * effectStrength * 10; // Y displacement
       }
       particlesGeometry.attributes.position.needsUpdate = true;
 
@@ -83,17 +99,28 @@ const Background: Component = () => {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Cleanup
     onCleanup(() => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("mousemove", onMouseMove);
       renderer.dispose();
     });
   });
 
-  return <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, "z-index": -1, background: 'radial-gradient(circle, #1a1a2e 0%, #0b0b1b 100%)' }} />;
-}
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        "z-index": -1,
+        background: "radial-gradient(circle, #1a1a2e 0%, #0b0b1b 100%)",
+      }}
+    />
+  );
+};
 
 export default Background;

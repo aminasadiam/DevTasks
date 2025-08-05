@@ -1,6 +1,6 @@
 BINDIR=bin
 MAIN=cmd/server/main.go
-APPNAME=devtasks
+APPNAME=devtasks.exe
 
 GOBUILD=go build
 GOTEST=go test

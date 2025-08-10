@@ -1,91 +1,154 @@
-import { Component, createSignal, onMount } from "solid-js";
+import { Component, createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import { login } from "../Services/LoginService.js";
 import GlassCard from "../components/GlassCard.jsx";
-import { checkAuth, login, logout } from "../Services/LoginService.js";
-import { A } from "@solidjs/router";
 
 const Login: Component = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
   const [error, setError] = createSignal("");
-  const [loggedIn, setLoggedIn] = createSignal(false); // Initialize with false
+  const [isLoading, setIsLoading] = createSignal(false);
 
-  onMount(async () => {
-    const usrname = localStorage.getItem("username") || "";
-    const isAuthenticated = await checkAuth(usrname);
-    setLoggedIn(isAuthenticated);
-  });
+  const handleLogin = async () => {
+    if (!username() || !password()) {
+      setError("Please fill in all fields");
+      return;
+    }
 
-  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError("");
+
     try {
-      const response = await login(username(), password());
-      console.log("Login successful:", response);
-      setLoggedIn(true);
-      setError("");
-      localStorage.setItem("username", username());
+      console.log("Starting login process...");
+      await login(username(), password());
+      console.log("Login successful, navigating to home...");
+      // Small delay to ensure authentication state is updated
+      setTimeout(() => {
+        navigate("/");
+        console.log("Navigation called");
+      }, 100);
     } catch (err) {
+      console.error("Login error in component:", err);
       setError(err instanceof Error ? err.message : "Login failed");
-      setLoggedIn(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleLogin();
     }
   };
 
   return (
-    <div class="flex items-center justify-center min-h-screen">
-      <GlassCard>
-        <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 text-center mb-8 animate-pulse">
-          DevTasks
-        </h1>
-        {error() && <div class="text-red-500 text-center mb-4">{error()}</div>}
-        {loggedIn() ? (
-          <div class="space-y-4">
-            <p class="text-white text-center">Welcome, {username()}!</p>
-            <A
-              href="/"
-              class="bg-sky-600 text-gray-300 py-2 px-4 rounded-md m-auto"
-            >
-              Home Page
-            </A>
+    <div class="min-h-screen flex items-center justify-center p-6">
+      <div class="w-full max-w-md">
+        <div class="text-center mb-8 animate-fade-in-down">
+          <div class="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl">🚀</span>
           </div>
-        ) : (
-          <div class="space-y-4">
-            <div>
-              <label class="block text-white mb-1" for="username">
+          <h1 class="text-4xl font-bold gradient-text mb-2">Welcome Back</h1>
+          <p class="text-white/70">Sign in to continue to DevTasks</p>
+        </div>
+
+        <GlassCard>
+          <div class="space-y-6">
+            {/* Error Display */}
+            {error() && (
+              <div class="bg-red-500/20 border border-red-500/30 rounded-xl p-4 text-red-300 text-sm animate-fade-in-up">
+                <div class="flex items-center gap-2">
+                  <span class="text-lg">⚠️</span>
+                  {error()}
+                </div>
+              </div>
+            )}
+
+            {/* Username Input */}
+            <div class="space-y-2">
+              <label class="block text-white font-medium text-sm">
                 Username
               </label>
               <input
-                id="username"
                 type="text"
-                class="w-full p-2 rounded bg-gray-900 bg-opacity-50 text-white border border-gray-700 focus:outline-none focus:border-blue-400 transition"
+                class="input-modern w-full"
                 value={username()}
                 onInput={(e) => setUsername(e.currentTarget.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="Enter your username"
+                disabled={isLoading()}
               />
             </div>
-            <div>
-              <label class="block text-white mb-1" for="password">
+
+            {/* Password Input */}
+            <div class="space-y-2">
+              <label class="block text-white font-medium text-sm">
                 Password
               </label>
               <input
-                id="password"
                 type="password"
-                class="w-full p-2 rounded bg-gray-900 bg-opacity-50 text-white border border-gray-700 focus:outline-none focus:border-blue-400 transition"
+                class="input-modern w-full"
                 value={password()}
                 onInput={(e) => setPassword(e.currentTarget.value)}
+                onKeyPress={handleKeyPress}
                 placeholder="Enter your password"
+                disabled={isLoading()}
               />
             </div>
+
+            {/* Login Button */}
             <button
-              class="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition cursor-pointer"
-              onClick={handleSubmit}
+              onclick={handleLogin}
+              disabled={isLoading()}
+              class={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                isLoading()
+                  ? "bg-gray-500 cursor-not-allowed opacity-50"
+                  : "btn-primary hover:scale-105"
+              }`}
             >
-              Log In
+              {isLoading() ? (
+                <div class="flex items-center justify-center gap-2">
+                  <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Signing In...
+                </div>
+              ) : (
+                <div class="flex items-center justify-center gap-2">
+                  <span>🔐</span>
+                  Sign In
+                </div>
+              )}
             </button>
 
-            <A href="/register" class="text-gray-400">
-              Create New Account
-            </A>
+            {/* Divider */}
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-white/20"></div>
+              </div>
+              <div class="relative flex justify-center text-sm">
+                <span class="px-4 bg-transparent text-white/50">
+                  New to DevTasks?
+                </span>
+              </div>
+            </div>
+
+            {/* Register Link */}
+            <button
+              onclick={() => navigate("/register")}
+              class="w-full py-3 rounded-xl font-medium text-white/80 hover:text-white transition-colors duration-300 hover:bg-white/10"
+            >
+              Create an account
+            </button>
           </div>
-        )}
-      </GlassCard>
+        </GlassCard>
+
+        {/* Footer */}
+        <div class="text-center mt-8 animate-fade-in-up">
+          <p class="text-white/50 text-sm">
+            © 2024 DevTasks. Built with ❤️ for productivity
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

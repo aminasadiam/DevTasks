@@ -12,6 +12,8 @@ export const [isAuthenticated, setIsAuthenticated] = createSignal(false);
 
 export const login = async (username: string, password: string): Promise<LoginResponse> => {
   try {
+    console.log('Attempting login for username:', username);
+    
     const formData = new FormData();
     formData.append('username', username);
     formData.append('password', password);
@@ -22,21 +24,60 @@ export const login = async (username: string, password: string): Promise<LoginRe
       credentials: 'include',
     });
 
+    console.log('Login response status:', response.status);
+
     if (!response.ok) {
       const errorData: LoginError = await response.json();
+      console.error('Login failed:', errorData);
       throw new Error(errorData.error || 'Login failed');
     }
 
     const data = await response.json();
+    console.log('Login response data:', data);
+    
     const csrfToken = data.csrfToken || '';
     if (csrfToken) {
       document.cookie = `csrf_token=${csrfToken}; path=/;`;
+      console.log('CSRF token set in cookie');
     }
+    
+    // Store username in localStorage for future use
+    localStorage.setItem('username', username);
+    console.log('Username stored in localStorage:', username);
+    
     setIsAuthenticated(true);
+    console.log('Login successful');
     return { csrfToken };
   } catch (error) {
     setIsAuthenticated(false);
     console.error('Login error:', error);
+    throw error instanceof Error ? error : new Error('Network error');
+  }
+};
+
+export const register = async (username: string, password: string): Promise<void> => {
+  try {
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('password', password);
+    // Generate a simple email from username for now
+    formData.append('email', `${username}@example.com`);
+
+    const response = await fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData: LoginError = await response.json();
+      throw new Error(errorData.error || 'Registration failed');
+    }
+    
+    // Registration successful, but don't store username yet since user needs to login
+    console.log('Registration successful');
+  } catch (error) {
+    console.error('Registration error:', error);
     throw error instanceof Error ? error : new Error('Network error');
   }
 };

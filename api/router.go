@@ -49,7 +49,7 @@ func Serve(config *config.ServerConfig) error {
 	// Tasks Routes
 	mux.HandleFunc("POST /api/tasks", GetTasks)
 	mux.HandleFunc("POST /api/add-task", AddTask)
-	mux.HandleFunc("GET /api/task", GetTaskById)
+	mux.HandleFunc("/api/task", GetTaskById) // Handle both GET and POST
 	mux.HandleFunc("PUT /api/update-task", UpdateTask)
 	mux.HandleFunc("DELETE /api/delete-task", DeleteTask)
 

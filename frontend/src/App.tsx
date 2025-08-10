@@ -1,19 +1,20 @@
 import { ParentProps, Show, type Component, onMount } from "solid-js";
 import Background from "./components/Background.jsx";
 import { Navigate, useLocation } from "@solidjs/router";
-import { checkAuth } from "./Services/LoginService.js";
+import {
+  checkAuth,
+  isAuthenticated as authSignal,
+} from "./Services/LoginService.js";
 import { createSignal, onCleanup } from "solid-js";
 
 const ProtectedRoute: Component<ParentProps> = (props: ParentProps) => {
   const location = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = createSignal(false);
   const [loading, setLoading] = createSignal(true);
 
   const check = async () => {
     setLoading(true);
     const currentUsername = localStorage.getItem("username") || "";
     const result = await checkAuth(currentUsername);
-    setIsAuthenticated(result);
     setLoading(false);
   };
 
@@ -35,7 +36,7 @@ const ProtectedRoute: Component<ParentProps> = (props: ParentProps) => {
     >
       <Show
         when={
-          isAuthenticated() ||
+          authSignal() ||
           location.pathname === "/login" ||
           location.pathname === "/register"
         }

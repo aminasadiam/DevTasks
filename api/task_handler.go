@@ -80,21 +80,64 @@ func AddTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func GetTaskById(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodGet && r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	if err := Authorize(r); err != nil {
+	// Handle authorization for both GET and POST
+	var username string
+	if r.Method == http.MethodGet {
+		username = r.URL.Query().Get("username")
+	} else {
+		username = r.FormValue("username")
+	}
+
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
+	// Check if user exists and validate session
+	user, ok := userRepository.GetUserByUsername(username)
+	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
-	taskIdStr := r.FormValue("task_id")
+	st, err := r.Cookie("session_token")
+	if err != nil || st.Value == "" || st.Value != user.SessionToken {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	csrf := r.Header.Get("X-CSRF-Token")
+	if csrf == "" || csrf != user.CSRFToken {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	var taskIdStr string
+	if r.Method == http.MethodGet {
+		taskIdStr = r.URL.Query().Get("task_id")
+	} else {
+		taskIdStr = r.FormValue("task_id")
+	}
+
+	if taskIdStr == "" {
+		http.Error(w, "Task ID is required", http.StatusBadRequest)
+		return
+	}
+
 	taskId, err := strconv.Atoi(taskIdStr)
 	if err != nil || taskId <= 0 {
 		http.Error(w, "Invalid task ID", http.StatusBadRequest)
@@ -164,7 +207,12 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }
 
 func DeleteTask(w http.ResponseWriter, r *http.Request) {
